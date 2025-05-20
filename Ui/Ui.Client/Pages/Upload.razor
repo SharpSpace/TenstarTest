@@ -1,0 +1,147 @@
+﻿@page "/upload"
+@rendermode InteractiveAuto
+
+@using Application.DTOs
+@using Application.Interfaces
+@using Domain.Entities
+@using System.Text
+
+@inject ILogger<Upload> Logger
+@inject IUserCsvService CsvService
+@inject IUserService UserService
+
+<style>
+    .table-responsive {
+        overflow-x: auto;
+        width: 100%;
+    }
+    .table td, .table th {
+        word-break: break-word;
+        max-width: 200px;
+        white-space: pre-line;
+    }
+    .cell-error {
+        background-color: #f8d7da !important;
+        color: #842029;
+    }
+    .table-danger {
+        background-color: #f8d7da !important;
+    }
+</style>
+
+<h3>Upload users.csv</h3>
+
+<InputFile OnChange="OnFileSelected" accept=".csv" />
+
+@if (_users.Count > 0)
+{
+    <button class="btn btn-success mb-2"
+            @onclick="SaveValidUsers"
+            disabled="@(ValidUsers.Count == 0)">
+        Save (@ValidUsers.Count) valid users
+    </button>
+    @if (_saveMessage is not null)
+    {
+        <div class="alert alert-info">@_saveMessage</div>
+    }
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Validation Errors</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var userResult in _users)
+                {
+                    <tr>
+                        <td class="@(userResult.HasError(x => x.FullName) ? "cell-error" : "")">
+                            @userResult.User.FullName
+                        </td>
+                        <td class="@(userResult.HasError(x => x.Username) ? "cell-error" : "")">
+                            @userResult.User.Username
+                        </td>
+                        <td class="@(userResult.HasError(x => x.Email) ? "cell-error" : "")">
+                            @userResult.User.Email
+                        </td>
+                        <td class="@(userResult.HasError(x => x.Password) ? "cell-error" : "")">
+                            @userResult.User.Password
+                        </td>
+                        <td>
+                            @if (userResult.ValidationResults.Any())
+                            {
+                                <ul>
+                                    @foreach (var error in userResult.ValidationResults)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-success">Valid</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private readonly List<UserValidationResult> _users = [];
+    private string? _saveMessage;
+
+    private List<User> ValidUsers => _users
+        .Where(u => !u.HasErrors)
+        .Select(u => u.User)
+        .ToList();
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        Logger.LogDebug("Begin upload file");
+        if (e.File is null)
+        {
+            return;
+        }
+
+        Logger.LogDebug("File selected: {File}", e.File.Name);
+
+        _users.Clear();
+
+        await using var stream = e.File.OpenReadStream();
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        await foreach (var result in CsvService.ParseAndValidateAsync(await reader.ReadToEndAsync()))
+        {
+            _users.Add(result);
+        }
+
+        _saveMessage = null;
+    }
+
+    private async Task SaveValidUsers()
+    {
+        if (ValidUsers.Count == 0)
+        {
+            _saveMessage = "No valid users to save.";
+            return;
+        }
+
+        try
+        {
+            await UserService.SaveUsersAsync(ValidUsers);
+            _saveMessage = $"{ValidUsers.Count} users saved!";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error when saving users.");
+            _saveMessage = "Error when saving users.";
+        }
+    }
+}

@@ -1,0 +1,20 @@
+Full name,Username,Email,Password
+Alice Johnson,alicej,something@example.com,P@ssword1
+Bob Smith,bobsmith,bob.smith@site,P@ssword1
+Charlie Brown,charlie_b,charlie.brown@example.com,password
+Edward LongnameLongnameLongnameLongnameLongnameLongnameLongnameLongnameLongnameLongnameLongnameLongnameedward,edward.long,edward@long.com,P@ssword1
+Frank Castle,frank,frank.castle@example.com,F@nkCastl3
+Grace Hopper,gracehopper,grace.hopper@example.com,Gh0pper!
+Helen Short,helen.short,helen.short@example.com,H3len!2024
+,missingfullname,missing.fullname@example.com,P@ssword1
+No Username,,nousername@example.com,P@ssword1
+No Email,no.email,,P@ssword1
+No Password,no.password,no.password@example.com,
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,toolongfullname,toolong.fullname@example.com,P@ssword1
+Long Name,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,long.username@example.com,P@ssword1
+Invalid Email,invalid.email,notanemail,P@ssword1
+Short Password,short.password,short.password@example.com,P@ssw1!
+No Uppercase,no.uppercase,no.uppercase@example.com,p@ssword1!
+No Lowercase,no.lowercase,no.lowercase@example.com,P@SSWORD1!
+No Digit,no.digit,no.digit@example.com,P@ssword!
+No Special,no.special,no.special@example.com,Passw0rd1
